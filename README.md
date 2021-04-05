@@ -6,6 +6,18 @@ README.docx is present only for historical purposes. It is not up-to-date and de
 
 A composer.json file is included, and a small number of composer tools is required for the full operation.
 
-In the uploaded fields, MS Word files, zips, and PDFs are supported. The downloadFile.php and download.php scripts will handle unpacking and converting them to rasterized PDFs.
+## Installation
 
-Finally, a software license (MIT) is included as well.
+1. Download the latest release zip/tar and unpack somplace
+1. Copy the entire directory into the `plugins` directory of the REDCap server
+1. Run `composer install` inside the `funded_grant_database` directory
+1. Grab the two data dictionaries from the `data_dictionary` folder
+1. Create two projects in REDCap (one for <ins>grants</ins>, one for <ins>users</ins>), and import the appropriate data dictionary
+1. Create an API token for the grants project and save the token in a file called `token.txt` in the `funded_grant_database` directory
+1. Edit `config.php` with the REDCap API url and PIDs for the two projects
+1. The database should now be accessible at ***\<your redcap url\>*/plugins/funded_grant_database/grants.php**
+
+## Usage
+
+1. Access to the database can be granted using the *users* project 
+1. Grants can be added using the *grants* project
