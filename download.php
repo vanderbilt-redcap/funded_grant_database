@@ -7,6 +7,14 @@ if (!isset($_COOKIE['grant_repo'])) {
 
 require_once("base.php");
 
+# update user role
+$role = updateRole($userid);
+
+# make sure role is not empty
+if ($role == "") {
+	header("Location: index.php");
+}
+
 // grant record id for logging purposes
 if (!isset($_GET['record'])) die('No Grant Identified');
 $grant = $_GET['record'];

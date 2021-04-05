@@ -7,7 +7,7 @@ if (!isset($_COOKIE['grant_repo'])) {
 require_once("base.php");
 
 $role = updateRole($userid);
-if ($role == 1 ) {
+if ($role == 1 | $role == "") {
 	header("Location: index.php");
 }
 

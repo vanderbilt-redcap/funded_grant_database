@@ -10,6 +10,11 @@ require_once("base.php");
 # update user role
 $role = updateRole($userid);
 
+# make sure role is not empty
+if ($role == "") {
+	header("Location: index.php");
+}
+
 
 $awards = array(
 		"k_awards" => "K Awards",
