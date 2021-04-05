@@ -13,8 +13,7 @@ A composer.json file is included, and a small number of composer tools is requir
 1. Run `composer install` inside the `funded_grant_database` directory
 1. Grab the two data dictionaries from the `data_dictionary` folder
 1. Create two projects in REDCap (one for <ins>grants</ins>, one for <ins>users</ins>), and import the appropriate data dictionary
-1. Create an API token for the grants project and save the token in a file called `token.txt` in the `funded_grant_database` directory
-1. Edit `config.php` with the REDCap API url and PIDs for the two projects
+1. Edit `config.php` with the PIDs for the two projects you created
 1. The database should now be accessible at ***\<your redcap url\>*/plugins/funded_grant_database/grants.php**
 
 ## Usage
