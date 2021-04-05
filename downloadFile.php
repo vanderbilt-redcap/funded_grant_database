@@ -20,7 +20,7 @@ require_once(dirname(__FILE__)."/vendor/autoload.php");
 
 // THIS SHORTS THE REST OF THE FILE AS IT'S NOT WORKING WELL
 // JUST DOWNLOAD THE ORIGINAL FILE
-displayFile($filename);
+displayFile2($filename);
 
 $phpOfficeObj = NULL;
 $pdfOut = $filename."_pdf.pdf"; 
@@ -86,6 +86,22 @@ function convertToImagePDF($fileIn, $fileOut) {
 	$imPdf->writeImages($fileOut, TRUE);
 	$imPdf->clear();
 	$imPdf->destroy();
+}
+
+function displayFile2($filename) {
+	header('Content-Disposition: attachment; filename="'.basename($filename).'"');
+    header('Content-Type: application/octet-stream');
+	header("Pragma: no-cache");
+	header("Cache-Control: no-cache, must-revalidate, post-check=0, pre-check=0");
+	header('Content-Length: ' . filesize($filename));
+    
+	//Clear system output buffer
+	flush();
+
+    // read the file from disk
+    readfile($filename);
+	//Terminate from the script
+	die();
 }
 
 function displayFile($filename) {
