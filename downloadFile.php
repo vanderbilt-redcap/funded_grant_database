@@ -16,7 +16,7 @@ if (!file_exists($filename)) {
 	die($dieMssg);
 }
 
-require_once(dirname(__FILE__)."/vendor/autoload.php");
+//require_once(dirname(__FILE__)."/vendor/autoload.php");
 
 // THIS SHORTS THE REST OF THE FILE AS IT'S NOT WORKING WELL
 // JUST DOWNLOAD THE ORIGINAL FILE

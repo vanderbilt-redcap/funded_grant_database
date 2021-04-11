@@ -10,7 +10,6 @@ A composer.json file is included, and a small number of composer tools is requir
 
 1. Download the latest release zip/tar and unpack somplace
 1. Copy the entire directory into the `plugins` directory of the REDCap server
-1. Run `composer install` inside the `funded_grant_database` directory
 1. Grab the two data dictionaries from the `data_dictionary` folder
 1. Create two projects in REDCap (one for <ins>grants</ins>, one for <ins>users</ins>), and import the appropriate data dictionary
 1. Edit `config.php` with the PIDs for the two projects you created
