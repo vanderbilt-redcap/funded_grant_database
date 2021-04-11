@@ -29,3 +29,7 @@ div.dtsp-panesContainer tr.selected:hover {
     cursor: pointer;
 }
 div.dataTableParentHidden { overflow:hidden; height:0px; width:100%; }
+div.ui-draggable { cursor: move; cursor: grab; cursor: -moz-grab; cursor: -webkit-grab; }
+div.ui-draggable-dragging { cursor: grabbing; cursor: -moz-grabbing; cursor: -webkit-grabbing; }
+div.dtsb-searchBuilder { cursor: inherit; }
+div.dtsb-searchBuilder select { cursor: pointer; }
