@@ -1,5 +1,7 @@
 <?php
 
+namespace YaleREDCap\FundedGrantDatabase;
+
 # verify user access
 if (!isset($_COOKIE['grant_repo'])) {
 	header("Location: index.php");

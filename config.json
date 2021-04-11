@@ -1,0 +1,65 @@
+{
+    "name": "Funded Grant Database",
+    "namespace": "YaleREDCap\\FundedGrantDatabase",
+    "description": "A database for storing funded grants and for controlling access of users to the database.",
+    "authors": [
+        {
+            "name": "Andrew Poppe",
+            "email": "andrew.poppe@yale.edu",
+            "institution": "Yale Center for Clinical Investigation"
+        }
+    ],
+    "permissions": [],
+    "framework-version": 5,
+    "links": {
+        "project": [
+            {
+                "name":"Funded Grant Database",
+                "icon": "fas fa-database",
+                "url": "src/index.php"
+            }
+        ],
+        "control-center": [
+            {
+                "name":"Funded Grant Database2",
+                "icon": "fas fa-database",
+                "url": "src/index.php"
+            }
+        ]
+    },
+    "system-settings": [
+        {
+            "key": "grants-project",
+            "name": "Grants REDCap Project",
+            "required": true,
+            "type": "project-id"
+        },
+        {
+            "key": "users-project",
+            "name": "Users REDCap Project",
+            "required": true,
+            "type": "project-id"
+        },
+        {
+            "key": "accent-color",
+            "name": "Accent Color",
+            "required": false,
+            "type": "color-picker"
+        },
+        {
+            "key": "logo",
+            "name": "Logo File",
+            "required": false,
+            "type": "file"
+        },
+        {
+            "key": "favicon",
+            "name": "Favicon File",
+            "required": false,
+            "type": "file"
+        }
+    ],
+    "project-settings": [
+
+    ]
+}

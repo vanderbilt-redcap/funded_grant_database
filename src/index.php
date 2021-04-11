@@ -1,4 +1,7 @@
 <?php
+
+namespace YaleREDCap\FundedGrantDatabase;
+
 require_once("base.php");
 
 $timestamp = date('Y-m-d');
@@ -17,7 +20,7 @@ if (db_num_rows($result) > 0) {
 # if they have agreed to the terms, create the cookie and redirect them to the grants page
 if (isset($_POST['submit'])) {
 	setcookie('grant_repo', $role);
-	header("Location: grants.php");
+    header("Location: ".$module->getUrl("src/grants.php"));
 }
  
 $startTs = strtotime("2021-01-01");
@@ -32,7 +35,7 @@ if (($user_id != "") && ($startTs <= time())) {
 
 echo '<html>
     <head>
-        <link rel="stylesheet" type="text/css" href="css/basic.css">
+        <link rel="stylesheet" type="text/css" href="'.$module->getUrl("css/basic.css").'">
     </head>
     <body style="background-color: #f9f9f9;">
         <br/>    

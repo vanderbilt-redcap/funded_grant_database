@@ -2,17 +2,17 @@
 /** Authors: Jon Scherdin, Andrew Poppe */
 # verify user access
 if (!isset($_COOKIE['grant_repo'])) {
-	header("Location: index.php");
+	header("Location: ".$module->getUrl("src/index.php"));
 }
 
-require_once("base.php");
+require_once($module->getUrl("src/base.php"));
 
 # update user role
 $role = updateRole($userid);
 
 # make sure role is not empty
 if ($role == "") {
-	header("Location: index.php");
+	header("Location: ".$module->getUrl("src/index.php"));
 }
 
 // grant record id for logging purposes
@@ -92,8 +92,8 @@ $role = updateRole($userid);
 <html>
 	<head>
 		<title>The Yale University Funded Grant Database - Document Download</title>
-		<link rel="shortcut icon" type="image" href="favicon.ico"/> 
-		<link rel="stylesheet" type="text/css" href="css/basic.css">
+		<link rel="shortcut icon" type="image" href="<?php echo $module->getUrl("img/favicon.ico") ?>"/> 
+		<link rel="stylesheet" type="text/css" href="<?php echo $module->getUrl("css/basic.css") ?>">
 	</head>
 	<br/>
 	<div id="container" style="padding-left:8%;  padding-right:10%; margin-left:auto; margin-right:auto; ">
@@ -108,7 +108,7 @@ $role = updateRole($userid);
 			echo "<h1>All Files (".count($files).")</h1>\n";
 			foreach ($files as $filename) {
 				$truncFilename = truncateFile($filename);
-				echo "<p><a href='downloadFile.php?f=".urlencode($truncFilename)."'>".basename($filename)."</a></p>\n";
+				echo "<p><a href='".$module->getUrl("src/downloadFile.php")."?f=".urlencode($truncFilename)."'>".basename($filename)."</a></p>\n";
 			}
 			exit();
 		} else {

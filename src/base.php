@@ -1,8 +1,8 @@
 <?php
 /** Authors: Jon Scherdin, Andrew Poppe */
 
-require_once("./config.php");
-require_once("../../redcap_connect.php");
+namespace YaleREDCap\FundedGrantDatabase;
+require_once("config.php");
 
 function getChoices($metadata) {
 	$choicesStrs = array();
@@ -65,12 +65,12 @@ function updateRole($userid) {
 }
 
 function createHeaderAndTaskBar($role) {
-	global $logoImage, $topBarColor, $grantsProjectId, $userProjectId;
+	global $module, $logoImage, $topBarColor, $grantsProjectId, $userProjectId;
 	echo '<div style="padding: 10px; background-color: '.$topBarColor.';"></div><img src="'.$logoImage.'" style="vertical-align:middle"/>
 			<hr>
-			<a href="grants.php">Grants</a> | ';
+			<a href="'.$module->getUrl("src/grants.php").'">Grants</a> | ';
 	if ($role != 1) {
-		echo '<a href="statistics.php">Use Statistics</a> | ';
+		echo '<a href="'.$module->getUrl("src/statistics.php").'">Use Statistics</a> | ';
 	}
 	if ($role == 3) {
 		echo "<a href='".APP_PATH_WEBROOT."DataEntry/record_status_dashboard.php?pid=$grantsProjectId' target='_blank'>Register Grants</a> | ";

@@ -6,5 +6,5 @@ $grantsProjectId = 15;
 $userProjectId = 16;
 
 // Aesthetics
-$logoImage = "./img/yu.png";
+$logoImage = $module->getUrl("img/yu.png");
 $topBarColor = "#00356b";
