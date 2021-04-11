@@ -1,5 +1,6 @@
 <?php
-/** Author: Andrew Poppe */
+
+namespace YaleREDCap\FundedGrantDatabase;
 
 // PIDs of REDCap Projects
 $grantsProjectId = 15;

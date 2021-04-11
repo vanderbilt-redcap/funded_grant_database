@@ -1,14 +1,17 @@
 <?php
+
+namespace YaleREDCap\FundedGrantDatabase;
+
 # verify user access
 if (!isset($_COOKIE['grant_repo'])) {
-	header("Location: index.php");
+	header("Location: ".$module->getUrl("src/index.php"));
 }
 
 require_once("base.php");
 
 $role = updateRole($userid);
 if ($role == 1 | $role == "") {
-	header("Location: index.php");
+	header("Location: ".$module->getUrl("src/index.php"));
 }
 
 # get metadata
@@ -77,10 +80,10 @@ while ($row = db_fetch_array($result)) {
 <html>
 	<head>
 		<title>The Yale University Funded Grant Database - Document Download Information</title>
-		<link rel="shortcut icon" type="image" href="favicon.ico"/> 
+		<link rel="shortcut icon" type="image" href="<?php echo $module->getUrl("img/favicon.ico") ?>"/> 
 		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.24/af-2.3.5/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/rg-1.1.2/sb-1.0.1/sp-1.2.2/sl-1.3.3/datatables.min.css"/>
- 		<link rel="stylesheet" type="text/css" href="css/basic.css">
+		<link rel="stylesheet" type="text/css" href="<?php echo $module->getUrl("css/basic.css") ?>">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
@@ -139,8 +142,8 @@ while ($row = db_fetch_array($result)) {
 				/*columns: [
 					{"data": "pi"},
 					{"data": "title"},
-					{"data": "type", "visible": false},
 					{"data": "number"},
+					{"data": "type"},
 					{"data": "user"},
 					{"data": "username"},
 					{"data": "timestamp"}
@@ -188,7 +191,22 @@ while ($row = db_fetch_array($result)) {
 					{
 						extend: 'searchBuilder'
 					},
-					'colvis', 'csv', 'excel', 'pdf'
+					{ 
+						extend: 'colvis',
+						exportOptions: { columns: ':visible' }
+					},
+					{
+						extend: 'csv',
+						exportOptions: { columns: ':visible' }
+					},
+					{ 
+						extend: 'excel',
+						exportOptions: { columns: ':visible' }
+					},
+					{ 
+						extend: 'pdf',
+						exportOptions: { columns: ':visible' }
+					}
 				]
 
 			});

@@ -1,7 +1,7 @@
 <?php
-/** Authors: Jon Scherdin, Andrew Poppe */
 
 namespace YaleREDCap\FundedGrantDatabase;
+
 require_once("config.php");
 
 function getChoices($metadata) {
@@ -38,19 +38,19 @@ function getChoices($metadata) {
 }
 
 function authenticate($uid, $timestamp) {
-	global $userProjectId;
+	global $module, $userProjectId;
     $sql = "SELECT a.value as 'userid', a2.value as 'role'
 		FROM redcap_data a
 		JOIN redcap_data a2
 		LEFT JOIN redcap_data a3 ON (a3.project_id =a.project_id AND a3.record = a.record AND a3.field_name = 'user_expiration')
-		WHERE a.project_id = $userProjectId
+		WHERE a.project_id = ?
 			AND a.field_name = 'user_id'
-			AND a.value = '$uid'
+			AND a.value = ?
 			AND a2.project_id = a.project_id
 			AND a2.record = a.record
 			AND a2.field_name = 'user_role'
-			AND (a3.value IS NULL OR a3.value > '$timestamp')";
-	return db_query($sql);   
+			AND (a3.value IS NULL OR a3.value > ?)";
+	return $module->query($sql, [$userProjectId, $uid, $timestamp]);   
 }
 
 function updateRole($userid) {
