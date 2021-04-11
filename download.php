@@ -7,6 +7,14 @@ if (!isset($_COOKIE['grant_repo'])) {
 
 require_once("base.php");
 
+# update user role
+$role = updateRole($userid);
+
+# make sure role is not empty
+if ($role == "") {
+	header("Location: index.php");
+}
+
 // grant record id for logging purposes
 if (!isset($_GET['record'])) die('No Grant Identified');
 $grant = $_GET['record'];
@@ -83,6 +91,8 @@ $role = updateRole($userid);
 ?>
 <html>
 	<head>
+		<title>The Yale University Funded Grant Database - Document Download</title>
+		<link rel="shortcut icon" type="image" href="favicon.ico"/> 
 		<link rel="stylesheet" type="text/css" href="css/basic.css">
 	</head>
 	<br/>

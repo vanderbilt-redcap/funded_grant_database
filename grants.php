@@ -10,22 +10,20 @@ require_once("base.php");
 # update user role
 $role = updateRole($userid);
 
+# make sure role is not empty
+if ($role == "") {
+	header("Location: index.php");
+}
+
 
 $awards = array(
-		"k_awards" => "K Awards",
-		"r_awards" => "R Awards",
-		"misc_awards" => "Misc. Awards",
-		"lrp_awards" => "LRP Awards",
-		"va_merit_awards" => "VA Merit Awards",
-		"f_awards" => "F Awards",
-		);
-
-# get query string variables
-$search = (isset($_GET['s'])) ? preg_replace('#[^a-z 0-9?!]#i', '', $_GET['s']) : "";
-$sort = (isset($_GET['o'])) ? $_GET['o'] : "pi";
-
-$sortSql = "";
-$searchSql = "";
+	"k_awards" => "K Awards",
+	"r_awards" => "R Awards",
+	"misc_awards" => "Misc. Awards",
+	"lrp_awards" => "LRP Awards",
+	"va_merit_awards" => "VA Merit Awards",
+	"f_awards" => "F Awards",
+);
 
 # get metadata
 $metadataJSON = \REDCap::getDataDictionary($grantsProjectId, "json");
@@ -40,96 +38,36 @@ $sql = "SELECT event_id
 			WHERE project_id = $grantsProjectId)";
 $eventId = db_result(db_query($sql), 0);
 
-# if search term has been submitted then search for term else show all grants
-if ($search != "") {
-	$searchSql = "AND d.record in (SELECT DISTINCT record FROM redcap_data WHERE project_id = $grantsProjectId AND value like '%$search%')";
-}
+$grants = json_decode(\REDCap::getData(array(
+	"project_id"=>$grantsProjectId, 
+	"return_format"=>"json", 
+	"combine_checkbox_values"=>true,
+	"exportAsLabels"=>true
+)), true);
 
-# sort - if sort item selected then order by field
-if ($sort == 'pi') {
-	$sortSql = "ORDER BY d2.value";
-}
-elseif ($sort == 'title') {
-	$sortSql = "ORDER BY d.value";
-}
-elseif ($sort == 'number') {
-	$sortSql = "ORDER BY d3.value";
-}
-else if ($sort == 'date') {
-	$sortSql = "ORDER BY d5.value";
-}
-elseif ($sort == 'format') {
-	$sortSql = "ORDER BY d6.value";
-}
+// get award options
+$awardOptions = getAllChoices($choices, array_keys($awards));
 
-$awardClause = "";
-foreach ($awards as $award => $awardTitle) {
-	if (isset($_GET[$award]) && $_GET[$award]) {
-		$awardValues = explode(",", $_GET[$award]);
-		if (in_array("ALL", $awardValues)) {
-			$awardField = $award;
-			$awardClause = "INNER JOIN redcap_data d7 ON (d7.project_id =d.project_id AND d7.record = d.record AND d7.field_name = '$awardField' AND d7.value IN ('".implode("','", array_keys($choices[$award]))."'))";
-			$search = "all ".$awardTitle;
-		} else {
-			$awardField = $award;
-            $awardValueStr = "('".implode("','", $awardValues)."')";
-			$awardClause = "INNER JOIN redcap_data d7 ON (d7.project_id =d.project_id AND d7.record = d.record AND d7.field_name = '$awardField' AND d7.value IN $awardValueStr)";
-            $awardStrs = [];
-            foreach ($awardValues as $awardValue) {
-                $awardStrs[] = $choices[$award][$awardValue];
-            }
-			$search = $awardTitle." as ".implode(" OR ", $awardStrs);
-		}
-	}
-}
-
-# Get the list of grants
-$sql = "SELECT DISTINCT d.record as 'record', d.value as 'title', d2.value as 'pi', d3.value as 'number', d4.value as 'file', d5.value as 'date', d6.value as 'format'
-		FROM redcap_data d
-		JOIN redcap_data d2
-		LEFT JOIN redcap_data d3 ON (d3.project_id =d.project_id AND d3.record = d.record AND d3.field_name = 'grants_number')
-		JOIN redcap_data d4
-		LEFT JOIN redcap_data d5 ON (d5.project_id =d.project_id AND d5.record = d.record AND d5.field_name = 'grants_date')
-		LEFT JOIN redcap_data d6 ON (d6.project_id =d.project_id AND d6.record = d.record AND d6.field_name = 'nih_format')
-		$awardClause
-		WHERE d.project_id = $grantsProjectId
-			$searchSql
-			AND d.field_name = 'grants_title'
-			AND d2.project_id = d.project_id
-			AND d2.record = d.record
-			AND d2.field_name = 'grants_pi'
-			AND d4.project_id = d.project_id
-			AND d4.record = d.record
-			AND d4.field_name = 'grants_file'
-		$sortSql";
-// echo "$sql<br/>";
-$grants = db_query($sql);
-$grantCount = db_num_rows($grants);
-
-# display message to user
-if ($search == "")
-	$message = "Displaying all $grantCount grants";
-else
-	$message = "Displaying $grantCount grants for: $search";
+// get award option values
+$awardOptionValues = combineValues($grants, array_keys($awards));
 
 ?>
 
 <html>
 	<head>
-		<title>The Yale University Funded Grant Database</title> 
-		<link rel="stylesheet" type="text/css" href="css/basic.css">
-		<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-		<script src="//cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+		<title>The Yale University Funded Grant Database</title>
+		<link rel="shortcut icon" type="image" href="favicon.ico"/> 
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.24/af-2.3.5/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/rg-1.1.2/sb-1.0.1/sp-1.2.2/sl-1.3.3/datatables.min.css"/>
+ 		<link rel="stylesheet" type="text/css" href="css/basic.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+		<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.24/af-2.3.5/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/rg-1.1.2/sb-1.0.1/sp-1.2.2/sl-1.3.3/datatables.min.js"></script>
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	</head>
 	<body>
 		<br/>
-		<script>
-		$(document).ready( function () {
-			// $('#filterTable').DataTable();
-			$('#grantsTable').DataTable({ "pageLength": 1000 });
-		});
-		</script>
 		<div id="container" style="padding-left:8%;  padding-right:10%; margin-left:auto; margin-right:auto; ">
 			<div id="header">
 				<?php createHeaderAndTaskBar($role);?>
@@ -138,102 +76,39 @@ else
 				<hr/>
 			</div>
 
-			<div id="filter">
-				<table id='filterTable'>
-				<tbody>
-				<tr>
-					<td style='vertical-align: middle;'>
-						Filter By: <select id='award_type' onchange='displayAwardList();'>
-							<option value=''>---SELECT---</option>
-							<?php
-							foreach ($awards as $award => $awardTitle) {
-								echo "<option value='$award'>$awardTitle</option>";
-							}
-							?>
-						</select>
-					</td>
-					<td colspan='2' style='vertical-align: middle;'>
-<?php
-echo "<form style='margin-bottom: 0px;' method='get'>";
-foreach($awards as $award => $awardTitle) {
-	echo "<select name='$award' id='$award' onchange='displayFilterButton();' style='display: none;'>";
-	echo "<option value=''>---SELECT---</option>";
-	echo "<option value='ALL'>---ALL---</option>";
-    $items = [];
-	foreach ($choices[$award] as $value => $label) {
-        $shortenedLabel = preg_replace("/^Original /", "", $label);
-        $shortenedLabel = preg_replace("/^Resub /", "", $shortenedLabel);
-        if (!isset($items[$shortenedLabel])) {
-            $items[$shortenedLabel] = [];
-        }
-        $items[$shortenedLabel][] = $value;
-    }
-	foreach ($items as $label => $values) {
-		echo "<option value='".implode(",", $values)."'>$label</option>";
-	}
-	echo "</select>";
-}
-echo "<input type='submit' style='display: none;' id='filterButton' value='Filter'>";
-echo "<input type='hidden' name='s' value='' />";
-echo "<input type='hidden' name='o' value='<?= $sort ?>' />";
-echo "</form>";
-?>
-<script>
-	function displayFilterButton() {
-		var item = $('#award_type').val();
-		var sel = $('#'+item).val();
-		if (sel != "") {
-			$('#filterButton').show();
-		}
-	}
-
-	function displayAwardList() {
-		var items = <?= json_encode($awards) ?>;
-		var item;
-		for (item in items) {
-			$('#'+item).hide();
-		}
-		item = $('#award_type').val();
-		if (item !== "") {
-			$('#'+item).show();
-		}
-	}
-</script>
-					</td>
-				</tr>
-				</tbody>
-				</table>
-			</div>
-
-			<div id="grants">
-				<div><strong><?= $message ?></strong></div>
+			<div id="grants" class="dataTableParentHidden">
 				<br/>
-				<table id="grantsTable">
+				<table id="grantsTable" class="dataTable">
 				<thead>
 					<tr>
 						<th>PI</th>
 						<th>Grant Title</th>
-						<th style="width: 90px;">NIH Format</th>
+						<th>NIH Format</th>
+						<th>Award Type</th>
+						<th>Award Option</th>
 						<th style="width: 150px;">Grant Date</th>
 						<th>Grant #</th>
 						<th>Acquire</th>
+						<th>Thesaurus</th>
 					</tr>
 				</thead>
 				<tbody>
 					<?php
-					$recordsWithAwards = [];
-					while ($row = db_fetch_assoc($grants)) {
+					foreach ($grants as $id=>$row) {
 						$url = "download.php?p=$grantsProjectId&id=" .
-							$row['file'] . "&s=&page=register_grants&record=" . $row['record'] . "&event_id=" .
+							$row['grants_file'] . "&s=&page=register_grants&record=" . $row['record_id'] . "&event_id=" .
 							$eventId . "&field_name=grants_file";
 
 						echo "<tr>";
-						echo "<td style='white-space:nowrap;'>" . $row['pi'] . "</td>";
-						echo "<td>" . $row['title'] . "</td>";
-						echo "<td style='text-align: center;'>" . (($row['format'] == "1") ? "NEW" : "OLD") . "</td>";
-						echo "<td style='text-align: center;'>" . $row['date'] ."</td>";
-						echo "<td style='white-space:nowrap;'>" . $row['number'] . "</td>";
-						echo "<td style='text-align: center;'><a href='$url'>Download</a></td>";
+							echo "<td style='white-space:nowrap;'>" . $row['grants_pi'] . "</td>";				// 0 - PI
+							echo "<td>" . $row['grants_title'] . "</td>";										// 1 - Title
+							echo "<td style='text-align: center;'></td>";										// 2 - NIH Format
+							echo "<td style='text-align: center;'>" . $row['grants_type'] . "</td>";			// 3 - Award Type
+							echo "<td style='text-align: center;'>" . $awardOptionValues[$id] . "</td>";		// 4 - Award Option
+							echo "<td style='text-align: center;'>" . $row['grants_date'] ."</td>";				// 5 - Grant Date
+							echo "<td style='text-align: center;'>" . $row['grants_number'] . "</td>";			// 6 - Grant Number
+							echo "<td style='text-align: center;'><a href='$url'>Download</a></td>";			// 7 - Acquire
+							echo "<td style='text-align: center;'>" . $row["grants_thesaurus"] . "</td>";		// 8 - Thesaurus (keywords)
 						echo "</tr>";
 					}
 					?>
@@ -241,6 +116,139 @@ echo "</form>";
 				</table>
 			</div>
 		</div>
+		<script>
+			function createOption(option, column) {
+				return {
+					label: option,
+					value: function(rowData, rowIdx) {return rowData[column].includes(`--${option}--`);}
+				}
+			}
+			function createPane(options, column, header) {
+				return {
+					header: header,
+					options: options.map(option => createOption(option, column))
+				}
+			}
+			let awardOptions = <?php 
+				echo '[';
+				foreach ($awardOptions as $awardOption) {
+					echo '"'.$awardOption.'",';
+				}
+				echo ']'; ?>;
+			let awardOptionValues = <?php
+				echo '[';
+				foreach ($awardOptionValues as $awardOptionValue) {
+					echo '"'.$awardOptionValue.'",';
+				}
+				echo ']'; ?>;
+			let awardOptionsCombined = awardOptionValues.reduce((acc, val)=> acc+val, "");
+			let awardOptionDropdownValues = awardOptions.filter(option => awardOptionsCombined.includes(`--${option}--`));
+
+
+			$(document).ready( function () {
+				$('#grantsTable').DataTable({
+					
+					
+					columns: [
+						{"data": "pi"},
+						{"data": "title"},
+						{"data": "format", "visible": false},
+						{"data": "awardType", "visible": false},
+						{"data": "awardOption", 
+							"visible": false, 
+							"type": "awardOption", 
+							"render": function(data,type,row) { 
+								return data.replace(/--/g, ', ').replace(/^(, )(, )*|(, )*(, )$/g, '');
+							} 
+						},
+						{"data": "date"},
+						{"data": "number"},
+						{"data": "acquire", "searchable": false},
+						{"data": "thesaurus", "visible": false}
+					],
+					columnDefs: [
+						{
+							searchPanes: {
+								show: true
+							},
+							targets: [0,1,3]
+						}
+					],
+					pageLength: 1000,
+					dom: 'Bfrtip',
+					buttons: [
+						{
+							extend: 'searchPanes',
+							config: {
+								cascadePanes: true,
+								panes: [
+									createPane(awardOptions, "awardOption", 'Award Option')
+								]
+							}
+							
+						},
+						{
+							extend: 'searchBuilder',
+							config: {
+								conditions: {
+									awardOption: {
+										contains: {
+											conditionName: 'Contains',
+											init: function (that, fn, preDefined = null) {
+												let el = $('<select/>').on('input', function() { fn(that, this) });
+												awardOptionDropdownValues.forEach(option => {
+													el[0].options.add($(`<option value="${option}" label="${option}"></option`)[0]);
+												});
+
+												if (preDefined !== null) {
+													$(el).val(preDefined[0]);
+												}
+
+												return el;
+											},
+											inputValue: function (el) {
+												return $(el[0]).val();
+											},
+											isInputValid: function (el, that) {
+												return $(el[0]).val().length !== 0;
+											},
+											search: function(value, comparison) {
+												return value.includes(`--${comparison}--`);
+											}
+										}
+									}
+								}
+							}
+						},
+						{
+							extend: 'csv',
+							exportOptions: { columns: ':visible' }
+						},
+						{ 
+							extend: 'excel',
+							exportOptions: { columns: ':visible' }
+						},
+						{ 
+							extend: 'pdf',
+							exportOptions: { columns: ':visible' }
+						},
+						{ 
+							extend: 'colvis',
+							exportOptions: { columns: ':visible' }
+						},
+					]
+				});
+
+				$('#grants').removeClass('dataTableParentHidden');
+				
+				$('#grantsTable').DataTable().on( 'buttons-action', function ( e, buttonApi, dataTable, node, config ) {
+					const text = buttonApi.text();
+					if (text.search(/Panes|Builder/)) {
+						$('.dt-button-collection').draggable();
+					}
+				});
+			});
+		</script>
     </body>
 </html>
 

@@ -79,3 +79,27 @@ function createHeaderAndTaskBar($role) {
 	echo '<a href ="http://projectreporter.nih.gov/reporter.cfm">NIH RePORTER</a> |
 	<a href ="http://grants.nih.gov/grants/oer.htm">NIH-OER</a>';
 }
+
+
+function getAllChoices($choices, $fields) {
+	$result = array();
+	foreach ($fields as $field) {
+		$result = array_merge($result, $choices[$field]);
+	}
+	return array_unique($result);
+}
+
+// Combines values from the provided fields using the provided separator
+// Takes data array and field array
+// Returns array of values, one entry per record in data array
+function combineValues($data, $fields) {
+	$result = array();
+	foreach ($data as $id=>$row) {
+		$values = array();
+		foreach ($fields as $field) {
+			$values[$field] = '--'.implode('--', explode(',', $row[$field])).'--';
+		}
+		$result[$id] = implode('--', array_unique($values));
+	}
+	return $result;
+}

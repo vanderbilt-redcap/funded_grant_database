@@ -41,9 +41,9 @@ echo '<html>
             <img src="'.$logoImage.'" style="vertical-align:middle"/>
             <hr>
             <h3>Yale University Funded Grant Database</h3>
-            <br/>
-            <?php if ($user_id != ""): ?>
-                <p><strong>NOTICE: You must agree to the following terms before using the Yale University Funded Grant Database</strong></p>
+            <br/>';
+if ($role != "") {
+    echo '<p><strong>NOTICE: You must agree to the following terms before using the Yale University Funded Grant Database</strong></p>
                 <ul> 
                     <li>I agree to keep the contents of the example grants confidential.</li>
                     <li>I will not share any part(s) of the grants in the database.</li>
@@ -53,9 +53,8 @@ echo '<html>
                 </ul>
                 <form  method="post">
                     <input type="submit" value="I agree to all terms above" name="submit" style="cursor: pointer;">
-                </form>
-			<?php else: ?>
-				Please contact Keith Choate at <a href="mailto:keith.choate@yale.edu">keith.choate@yale.edu</a> to gain access to the Yale University Funded Grant Database.
-			<?php endif ?>
-        </div>
-    </html>';
+                </form>';
+} else {
+    echo 'Please contact Keith Choate at <a href="mailto:keith.choate@yale.edu">keith.choate@yale.edu</a> to gain access to the Yale University Funded Grant Database.';
+}
+echo '</div></html>';
