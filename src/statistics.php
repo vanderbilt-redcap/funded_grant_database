@@ -75,11 +75,10 @@ while ($row = $result->fetch_array()) {
 	$downloads[$row['pk']]['hits'][] = array('ts' => $row['ts'], 'user' => $name, 'username' => $username);
 }
 ?>
-
 <html>
 	<head>
-		<title>The Yale University Funded Grant Database - Document Download Information</title>
-		<link rel="shortcut icon" type="image" href="<?php echo $module->getUrl("img/favicon.ico") ?>"/> 
+		<title><?php echo $databaseTitle ?> - Document Download Information</title>
+		<link rel="shortcut icon" type="image" href="<?php echo $faviconImage ?>"/> 
 		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.24/af-2.3.5/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/rg-1.1.2/sb-1.0.1/sp-1.2.2/sl-1.3.3/datatables.min.css"/>
 		<link rel="stylesheet" type="text/css" href="<?php echo $module->getUrl("css/basic.css") ?>">
@@ -87,16 +86,34 @@ while ($row = $result->fetch_array()) {
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
 		<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.24/af-2.3.5/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/rg-1.1.2/sb-1.0.1/sp-1.2.2/sl-1.3.3/datatables.min.js"></script>
-		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>		
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		<style>
+			table.dataTable tr.dtrg-group.dtrg-level-0 td { 
+				background-color: <?php echo $accentColor; ?>; 
+				color: <?php echo $accentTextColor; ?>;
+			}
+			div.dtsp-panesContainer tr.selected {
+				background-color: <?php echo $secondaryAccentColor; ?> !important;
+				color: <?php echo $secondaryTextColor; ?>;
+			}
+			div.dtsp-panesContainer tr.selected:hover {
+				background-color: <?php echo adjustBrightness($secondaryAccentColor, -0.25); ?> !important;
+				color: <?php
+					$newColor = adjustBrightness($secondaryAccentColor, -0.25);
+					echo adjustBrightness($secondaryTextColor, getBrightness($newColor) >= 0.50 ? -0.50 : 0.50); 
+				?>;
+				cursor: pointer;
+			}
+		</style>		
 	</head>
 	<body>
 		<br/>
-		<div style="padding-left:8%;  padding-right:10%; margin-left:auto; margin-right:auto;   ">
+		<div style="padding-left:8%;  padding-right:10%; margin-left:auto; margin-right:auto;">
 			<div id="header">
 				<?php
 					createHeaderAndTaskBar($role);
 				?>
-				<h3>Yale University Funded Grant Database - Usage Statistics</h3>
+				<h3><?php echo $databaseTitle ?> - Usage Statistics</h3>
 				<i>This page shows who has downloaded grant documents and when they did so.</i>
 				<hr><br/>
 			</div>
@@ -161,8 +178,8 @@ while ($row = $result->fetch_array()) {
 						targets: [0,1,2,3],
 						visible: false,
 						searchable: true
-					},
-					{
+					}
+					/*{
 						targets: [2],
 						searchPanes:{
 							options:[
@@ -174,7 +191,7 @@ while ($row = $result->fetch_array()) {
 								}
 							]
 						}
-					}
+					}*/
 				],
 				
 				//pageLength: 1000,

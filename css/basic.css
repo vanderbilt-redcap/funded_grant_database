@@ -4,7 +4,7 @@ table { border-collapse: collapse; }
 table.dataTable tbody tr.even { background-color: #f2f2f2; } 
 button.dt-button { padding: .1em .2em; }
 table.dataTable tr.dtrg-group.dtrg-level-0 td { 
-    background-color: #00356b; 
+    background-color: #00356b;
     color: #f9f9f9;
 }
 table.dataTable tr.dtrg-group.dtrg-level-1 td { 
@@ -18,14 +18,14 @@ div.dtsp-panesContainer tr {
     background-color: #fff !important;
 }
 div.dtsp-panesContainer tr.selected {
-    background-color: #b0bed9 !important;
+    background-color: #809ab5 !important;
 }
 div.dtsp-panesContainer tr:hover {
     background-color: #aaa !important;
     cursor: pointer;
 }
 div.dtsp-panesContainer tr.selected:hover {
-    background-color: #7695d4 !important;
+    background-color: #406890 !important;
     cursor: pointer;
 }
 div.dataTableParentHidden { overflow:hidden; height:0px; width:100%; }

@@ -21,7 +21,7 @@
         ],
         "control-center": [
             {
-                "name":"Funded Grant Database2",
+                "name":"Funded Grant Database",
                 "icon": "fas fa-database",
                 "url": "src/index.php"
             }
@@ -29,34 +29,70 @@
     },
     "system-settings": [
         {
+            "key": "info1",
+            "name": "<strong>The following settings are required. See the EM documentation for more details.</strong>",
+            "required": false,
+            "type": "descriptive"
+        },
+        {
             "key": "grants-project",
-            "name": "Grants REDCap Project",
+            "name": "<strong>Grants REDCap Project:</strong><br>Select the project that will hold the grant data. You can download a data dictionary for the grants project <strong><a href=\"https://github.com/AndrewPoppe/funded_grant_database/tree/main/data_dictionary\" target=\"_blank\">here</a></strong>",
             "required": true,
             "type": "project-id"
         },
         {
             "key": "users-project",
-            "name": "Users REDCap Project",
+            "name": "<strong>Users REDCap Project</strong>",
             "required": true,
             "type": "project-id"
         },
         {
+            "key": "info2",
+            "name": "<strong>The following optional settings control cosmetic and text changes.</strong>",
+            "required": false,
+            "type": "descriptive"
+        },
+        {
             "key": "accent-color",
-            "name": "Accent Color",
+            "name": "<strong>Accent Color:</strong><br>The main accent color used in the EM",
+            "required": false,
+            "type": "color-picker"
+        },
+        {
+            "key": "text-color",
+            "name": "<strong>Accent Text Color:</strong><br>The color of text used with the main accent color",
+            "required": false,
+            "type": "color-picker"
+        },
+        {
+            "key": "secondary-accent-color",
+            "name": "<strong>Secondary Accent Color:</strong><br>The secondary color used in the EM",
+            "required": false,
+            "type": "color-picker"
+        },
+        {
+            "key": "secondary-text-color",
+            "name": "<strong>Secondary Accent Text Color:</strong><br>The color of text used with the secondary accent color",
             "required": false,
             "type": "color-picker"
         },
         {
             "key": "logo",
-            "name": "Logo File",
+            "name": "<strong>Logo File</strong>",
             "required": false,
             "type": "file"
         },
         {
             "key": "favicon",
-            "name": "Favicon File",
+            "name": "<strong>Favicon File</strong>",
             "required": false,
             "type": "file"
+        },
+        {
+            "key": "database-title",
+            "name": "<strong>Database Title</strong>:<br>The title of the database, used throughout the EM<br>Default is: <em>Yale University Funded Grant Database</em>",
+            "required": false,
+            "type": "text"
         }
     ],
     "project-settings": [

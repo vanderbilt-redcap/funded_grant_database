@@ -40,13 +40,13 @@ echo '<html>
     <body style="background-color: #f9f9f9;">
         <br/>    
         <div style="padding-left:8%;  padding-right:10%; margin-left:auto; margin-right:auto; ">
-            <div style="padding: 10px; background-color: '.$topBarColor.';"></div>  
+            <div style="padding: 10px; background-color: '.$accentColor.';"></div>  
             <img src="'.$logoImage.'" style="vertical-align:middle"/>
             <hr>
-            <h3>Yale University Funded Grant Database</h3>
+            <h3>'.$databaseTitle.'</h3>
             <br/>';
 if ($role != "") {
-    echo '<p><strong>NOTICE: You must agree to the following terms before using the Yale University Funded Grant Database</strong></p>
+    echo '<p><strong>NOTICE: You must agree to the following terms before using the '.$databaseTitle.'</strong></p>
                 <ul> 
                     <li>I agree to keep the contents of the example grants confidential.</li>
                     <li>I will not share any part(s) of the grants in the database.</li>
@@ -58,6 +58,6 @@ if ($role != "") {
                     <input type="submit" value="I agree to all terms above" name="submit" style="cursor: pointer;">
                 </form>';
 } else {
-    echo 'Please contact Keith Choate at <a href="mailto:keith.choate@yale.edu">keith.choate@yale.edu</a> to gain access to the Yale University Funded Grant Database.';
+    echo 'Please contact Keith Choate at <a href="mailto:keith.choate@yale.edu">keith.choate@yale.edu</a> to gain access to the '.$databaseTitle.'.';
 }
 echo '</div></html>';
