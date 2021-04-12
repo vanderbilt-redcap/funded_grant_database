@@ -60,6 +60,24 @@ $awardOptionValues = combineValues($grants, array_keys($awards));
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
 		<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.24/af-2.3.5/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/rg-1.1.2/sb-1.0.1/sp-1.2.2/sl-1.3.3/datatables.min.js"></script>
 		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		<style>
+			table.dataTable tr.dtrg-group.dtrg-level-0 td { 
+				background-color: <?php echo $accentColor; ?>; 
+				color: <?php echo $accentTextColor; ?>;
+			}
+			div.dtsp-panesContainer tr.selected {
+				background-color: <?php echo $secondaryAccentColor; ?> !important;
+				color: <?php echo $secondaryTextColor; ?>;
+			}
+			div.dtsp-panesContainer tr.selected:hover {
+				background-color: <?php echo adjustBrightness($secondaryAccentColor, -0.25); ?> !important;
+				color: <?php
+					$newColor = adjustBrightness($secondaryAccentColor, -0.25);
+					echo adjustBrightness($secondaryTextColor, getBrightness($newColor) >= 0.50 ? -0.50 : 0.50); 
+				?>;
+				cursor: pointer;
+			}
+		</style>	
 	</head>
 	<body>
 		<br/>
