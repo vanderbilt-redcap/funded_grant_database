@@ -32,13 +32,7 @@ $metadataJSON = \REDCap::getDataDictionary($grantsProjectId, "json");
 $choices = getChoices(json_decode($metadataJSON, true));
 
 # get event_id
-$sql = "SELECT event_id
-		FROM redcap_events_metadata           
-		WHERE arm_id =
-			(SELECT arm_id
-			FROM redcap_events_arms
-			WHERE project_id = $grantsProjectId)";
-$eventId = db_result(db_query($sql), 0);
+$eventId = $module->getEventId($grantsProjectId);
 
 $grants = json_decode(\REDCap::getData(array(
 	"project_id"=>$grantsProjectId, 
@@ -52,6 +46,7 @@ $awardOptions = getAllChoices($choices, array_keys($awards));
 
 // get award option values
 $awardOptionValues = combineValues($grants, array_keys($awards));
+print_r($awardOptionValues);
 
 ?>
 
@@ -159,8 +154,11 @@ $awardOptionValues = combineValues($grants, array_keys($awards));
 						{"data": "awardOption", 
 							"visible": false, 
 							"type": "awardOption", 
-							"render": function(data,type,row) { 
-								return data.replace(/--/g, ', ').replace(/^(, )(, )*|(, )*(, )$/g, '');
+							"render": function(data,type,row) {
+								if (type === 'display') {
+									return data.replace(/--/g, ', ').replace(/^(, )(, )*|(, )*(, )$/g, '');
+								}
+								return data;
 							} 
 						},
 						{"data": "date"},
@@ -215,6 +213,7 @@ $awardOptionValues = combineValues($grants, array_keys($awards));
 												return $(el[0]).val().length !== 0;
 											},
 											search: function(value, comparison) {
+												console.log('value:', value, '; comparison: ', comparison );
 												return value.includes(`--${comparison}--`);
 											}
 										}

@@ -18,24 +18,15 @@ if ($role == 1 | $role == "") {
 $metadataJSON = \REDCap::getDataDictionary($grantsProjectId, "json");
 $choices = getChoices(json_decode($metadataJSON, true));
 
+# get grant data records
 $filterLogic = $role == 2 ? '[pi_netid] = "'.$userid.'"' : NULL;
-
-# if role=2, then we only want to show stats for their specific grants
-if ($role == 2) {
-	$filterLogSql = " AND e.pk IN
-		(SELECT record
-		FROM redcap_data
-		WHERE project_id = $grantsProjectId
-		AND field_name = 'pi_netid'
-		AND value = '$userid')";
-}
-
 $grants_result = json_decode(\REDCap::getData(array(
 	'project_id'=>$grantsProjectId, 
 	'filterLogic'=>$filterLogic,
 	"return_format"=>"json"
 )), true);
 
+# grant types
 $grant_types = $choices['grants_type'];
 
 # create array to hold downloads
@@ -55,15 +46,23 @@ foreach ($user_result as $row) {
 	$netIds[$row['user_id']] = array($row['first_name'], $row['last_name']);
 }
 $logEventTable = \REDCap::getLogEventTable($grantsProjectId);
-$sql = "SELECT e.ts, e.user, e.pk
-		FROM $logEventTable e
-        WHERE e.project_id = $grantsProjectId
-            AND e.description = 'Download uploaded document'
-			$filterLogSql
-		ORDER BY e.ts DESC";
-$result = db_query($sql);
 
-while ($row = db_fetch_array($result)) {
+$query = $module->createQuery();
+$query->add("SELECT e.ts, e.user, e.pk 
+	FROM $logEventTable e 
+	WHERE e.project_id = ?
+	AND e.description = 'Download uploaded document'", $grantsProjectId);
+if ($role == 2) {
+	$query->add("AND e.pk IN (SELECT record
+	FROM redcap_data
+	WHERE project_id = ?
+	AND field_name = 'pi_netid'
+	AND value = ?)", [$grantsProjectId, $userid]); 
+}
+$query->add("ORDER BY e.ts DESC");
+$result = $query->execute();
+
+while ($row = $result->fetch_array()) {
 	if ($netIds[$row['user']] && $netIds[$row['user']][0]) {
 		$name = $netIds[$row['user']][0] . " " . $netIds[$row['user']][1];
 		$username = $row['user'];
@@ -191,21 +190,18 @@ while ($row = db_fetch_array($result)) {
 					{
 						extend: 'searchBuilder'
 					},
-					{ 
-						extend: 'colvis',
-						exportOptions: { columns: ':visible' }
-					},
+					'colvis',
 					{
 						extend: 'csv',
-						exportOptions: { columns: ':visible' }
+						exportOptions: { columns: [0, 1, 2, ':visible'] }
 					},
 					{ 
 						extend: 'excel',
-						exportOptions: { columns: ':visible' }
+						exportOptions: { columns: [0, 1, 2, ':visible'] }
 					},
 					{ 
 						extend: 'pdf',
-						exportOptions: { columns: ':visible' }
+						exportOptions: { columns: [0, 1, 2, ':visible'] }
 					}
 				]
 
