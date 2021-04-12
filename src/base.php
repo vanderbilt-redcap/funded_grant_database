@@ -1,8 +1,8 @@
 <?php
-/** Authors: Jon Scherdin, Andrew Poppe */
 
-require_once("./config.php");
-require_once("../../redcap_connect.php");
+namespace YaleREDCap\FundedGrantDatabase;
+
+require_once("config.php");
 
 function getChoices($metadata) {
 	$choicesStrs = array();
@@ -38,19 +38,19 @@ function getChoices($metadata) {
 }
 
 function authenticate($uid, $timestamp) {
-	global $userProjectId;
+	global $module, $userProjectId;
     $sql = "SELECT a.value as 'userid', a2.value as 'role'
 		FROM redcap_data a
 		JOIN redcap_data a2
 		LEFT JOIN redcap_data a3 ON (a3.project_id =a.project_id AND a3.record = a.record AND a3.field_name = 'user_expiration')
-		WHERE a.project_id = $userProjectId
+		WHERE a.project_id = ?
 			AND a.field_name = 'user_id'
-			AND a.value = '$uid'
+			AND a.value = ?
 			AND a2.project_id = a.project_id
 			AND a2.record = a.record
 			AND a2.field_name = 'user_role'
-			AND (a3.value IS NULL OR a3.value > '$timestamp')";
-	return db_query($sql);   
+			AND (a3.value IS NULL OR a3.value > ?)";
+	return $module->query($sql, [$userProjectId, $uid, $timestamp]);   
 }
 
 function updateRole($userid) {
@@ -65,12 +65,12 @@ function updateRole($userid) {
 }
 
 function createHeaderAndTaskBar($role) {
-	global $logoImage, $topBarColor, $grantsProjectId, $userProjectId;
-	echo '<div style="padding: 10px; background-color: '.$topBarColor.';"></div><img src="'.$logoImage.'" style="vertical-align:middle"/>
+	global $module, $logoImage, $accentColor, $grantsProjectId, $userProjectId;
+	echo '<div style="padding: 10px; background-color: '.$accentColor.';"></div><img src="'.$logoImage.'" style="vertical-align:middle"/>
 			<hr>
-			<a href="grants.php">Grants</a> | ';
+			<a href="'.$module->getUrl("src/grants.php").'">Grants</a> | ';
 	if ($role != 1) {
-		echo '<a href="statistics.php">Use Statistics</a> | ';
+		echo '<a href="'.$module->getUrl("src/statistics.php").'">Use Statistics</a> | ';
 	}
 	if ($role == 3) {
 		echo "<a href='".APP_PATH_WEBROOT."DataEntry/record_status_dashboard.php?pid=$grantsProjectId' target='_blank'>Register Grants</a> | ";
@@ -103,3 +103,40 @@ function combineValues($data, $fields) {
 	}
 	return $result;
 }
+
+function adjustBrightness($hexCode, $adjustPercent) {
+    $hexCode = ltrim($hexCode, '#');
+
+    if (strlen($hexCode) == 3) {
+        $hexCode = $hexCode[0] . $hexCode[0] . $hexCode[1] . $hexCode[1] . $hexCode[2] . $hexCode[2];
+    }
+
+    $hexCode = array_map('hexdec', str_split($hexCode, 2));
+
+    foreach ($hexCode as & $color) {
+        $adjustableLimit = $adjustPercent < 0 ? $color : 255 - $color;
+        $adjustAmount = ceil($adjustableLimit * $adjustPercent);
+
+        $color = str_pad(dechex($color + $adjustAmount), 2, '0', STR_PAD_LEFT);
+    }
+
+    return '#' . implode($hexCode);
+}
+
+function getBrightness($hexCode) {
+    $hexCode = ltrim($hexCode, '#');
+
+    if (strlen($hexCode) == 3) {
+        $hexCode = $hexCode[0] . $hexCode[0] . $hexCode[1] . $hexCode[1] . $hexCode[2] . $hexCode[2];
+    }
+
+    $hexCode = array_map('hexdec', str_split($hexCode, 2));
+
+	$sum = 0;
+    foreach ($hexCode as $color) {
+        $sum += $color;
+    }
+
+    return $sum / (255*3);
+}
+

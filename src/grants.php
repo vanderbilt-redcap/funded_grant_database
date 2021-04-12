@@ -1,8 +1,10 @@
 <?php
 
+namespace YaleREDCap\FundedGrantDatabase;
+
 # verify user access
 if (!isset($_COOKIE['grant_repo'])) {
-	header("Location: index.php");
+	header("Location: ".$module->getUrl("index.php"));
 }
 
 require_once("base.php");
@@ -12,7 +14,7 @@ $role = updateRole($userid);
 
 # make sure role is not empty
 if ($role == "") {
-	header("Location: index.php");
+	header("Location: ".$module->getUrl("index.php"));
 }
 
 
@@ -30,13 +32,7 @@ $metadataJSON = \REDCap::getDataDictionary($grantsProjectId, "json");
 $choices = getChoices(json_decode($metadataJSON, true));
 
 # get event_id
-$sql = "SELECT event_id
-		FROM redcap_events_metadata           
-		WHERE arm_id =
-			(SELECT arm_id
-			FROM redcap_events_arms
-			WHERE project_id = $grantsProjectId)";
-$eventId = db_result(db_query($sql), 0);
+$eventId = $module->getEventId($grantsProjectId);
 
 $grants = json_decode(\REDCap::getData(array(
 	"project_id"=>$grantsProjectId, 
@@ -50,16 +46,15 @@ $awardOptions = getAllChoices($choices, array_keys($awards));
 
 // get award option values
 $awardOptionValues = combineValues($grants, array_keys($awards));
-
 ?>
 
 <html>
 	<head>
-		<title>The Yale University Funded Grant Database</title>
-		<link rel="shortcut icon" type="image" href="favicon.ico"/> 
+		<title><?php echo $databaseTitle ?></title>
+		<link rel="shortcut icon" type="image" href="<?php echo $faviconImage ?>"/> 
 		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.24/af-2.3.5/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/rg-1.1.2/sb-1.0.1/sp-1.2.2/sl-1.3.3/datatables.min.css"/>
- 		<link rel="stylesheet" type="text/css" href="css/basic.css">
+ 		<link rel="stylesheet" type="text/css" href="<?php echo $module->getUrl("css/basic.css") ?>">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
@@ -71,7 +66,7 @@ $awardOptionValues = combineValues($grants, array_keys($awards));
 		<div id="container" style="padding-left:8%;  padding-right:10%; margin-left:auto; margin-right:auto; ">
 			<div id="header">
 				<?php createHeaderAndTaskBar($role);?>
-				<h3>Yale University Funded Grant Database</h3>
+				<h3><?php echo $databaseTitle ?></h3>
 				<i>You may download grant documents by clicking "download" links below. The use of the grants document database is strictly limited to authorized individuals and you are not permitted to share files or any embedded content with other individuals. All file downloads are logged.</i>
 				<hr/>
 			</div>
@@ -95,9 +90,9 @@ $awardOptionValues = combineValues($grants, array_keys($awards));
 				<tbody>
 					<?php
 					foreach ($grants as $id=>$row) {
-						$url = "download.php?p=$grantsProjectId&id=" .
+						$url = $module->getUrl("src/download.php?p=$grantsProjectId&id=" .
 							$row['grants_file'] . "&s=&page=register_grants&record=" . $row['record_id'] . "&event_id=" .
-							$eventId . "&field_name=grants_file";
+							$eventId . "&field_name=grants_file");
 
 						echo "<tr>";
 							echo "<td style='white-space:nowrap;'>" . $row['grants_pi'] . "</td>";				// 0 - PI
@@ -157,8 +152,11 @@ $awardOptionValues = combineValues($grants, array_keys($awards));
 						{"data": "awardOption", 
 							"visible": false, 
 							"type": "awardOption", 
-							"render": function(data,type,row) { 
-								return data.replace(/--/g, ', ').replace(/^(, )(, )*|(, )*(, )$/g, '');
+							"render": function(data,type,row) {
+								if (type === 'display') {
+									return data.replace(/--/g, ', ').replace(/^(, )(, )*|(, )*(, )$/g, '');
+								}
+								return data;
 							} 
 						},
 						{"data": "date"},
@@ -213,12 +211,17 @@ $awardOptionValues = combineValues($grants, array_keys($awards));
 												return $(el[0]).val().length !== 0;
 											},
 											search: function(value, comparison) {
+												console.log('value:', value, '; comparison: ', comparison );
 												return value.includes(`--${comparison}--`);
 											}
 										}
 									}
 								}
 							}
+						},
+						{ 
+							extend: 'colvis',
+							exportOptions: { columns: ':visible' }
 						},
 						{
 							extend: 'csv',
@@ -231,11 +234,7 @@ $awardOptionValues = combineValues($grants, array_keys($awards));
 						{ 
 							extend: 'pdf',
 							exportOptions: { columns: ':visible' }
-						},
-						{ 
-							extend: 'colvis',
-							exportOptions: { columns: ':visible' }
-						},
+						}
 					]
 				});
 

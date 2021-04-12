@@ -1,8 +1,10 @@
 <?php
-/** Authors: Jon Scherdin, Andrew Poppe */
+
+namespace YaleREDCap\FundedGrantDatabase;
+
 # verify user access
 if (!isset($_COOKIE['grant_repo'])) {
-	header("Location: index.php");
+	header("Location: ".$module->getUrl("src/index.php"));
 }
 
 require_once("base.php");
@@ -12,7 +14,7 @@ $role = updateRole($userid);
 
 # make sure role is not empty
 if ($role == "") {
-	header("Location: index.php");
+	header("Location: ".$module->getUrl("src/index.php"));
 }
 
 // grant record id for logging purposes
@@ -32,12 +34,8 @@ define("PROJECT_ID", $project_id);
 
 
 //Download file from the "edocs" web server directory
-$sql = "select * from redcap_edocs_metadata where project_id = $project_id and doc_id = ".$_GET['id'];
-$q = db_query($sql);
-if (!db_num_rows($q)) {
-	die("<b>{$lang['global_01']}:</b> {$lang['file_download_03']}");
-}
-$this_file = db_fetch_array($q);
+$result = $module->query("select * from redcap_edocs_metadata where project_id = ? and doc_id = ?", [ $project_id, $_GET['id'] ]);
+$this_file = db_fetch_array($result);
 
 $basename = preg_replace("/\.[^\.]*$/", "", $this_file['stored_name']);
 if (!preg_match("/\/$/", $basename)) {
@@ -48,7 +46,7 @@ mkdir($outDir);
 
 $files = array();
 if (preg_match("/\.zip$/i", $this_file['stored_name']) || ($this_file['mime_type'] == "application/x-zip-compressed")) {
-	$zip = new ZipArchive;
+	$zip = new \ZipArchive;
 	$res = $zip->open(EDOC_PATH.$this_file['stored_name']);
 	if ($res) {
 		$zip->extractTo($outDir);
@@ -87,13 +85,12 @@ function inspectDir($dir) {
 	return $files;
 }
 
-$role = updateRole($userid);
 ?>
 <html>
 	<head>
-		<title>The Yale University Funded Grant Database - Document Download</title>
-		<link rel="shortcut icon" type="image" href="favicon.ico"/> 
-		<link rel="stylesheet" type="text/css" href="css/basic.css">
+		<title><?php echo $databaseTitle ?> - Document Download</title>
+		<link rel="shortcut icon" type="image" href="<?php echo $faviconImage ?>"/> 
+		<link rel="stylesheet" type="text/css" href="<?php echo $module->getUrl("css/basic.css") ?>">
 	</head>
 	<br/>
 	<div id="container" style="padding-left:8%;  padding-right:10%; margin-left:auto; margin-right:auto; ">
@@ -108,7 +105,7 @@ $role = updateRole($userid);
 			echo "<h1>All Files (".count($files).")</h1>\n";
 			foreach ($files as $filename) {
 				$truncFilename = truncateFile($filename);
-				echo "<p><a href='downloadFile.php?f=".urlencode($truncFilename)."'>".basename($filename)."</a></p>\n";
+				echo "<p><a href='".$module->getUrl("src/downloadFile.php?f=".urlencode($truncFilename))."'>".basename($filename)."</a></p>\n";
 			}
 			exit();
 		} else {

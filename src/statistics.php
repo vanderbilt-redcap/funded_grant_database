@@ -1,38 +1,32 @@
 <?php
+
+namespace YaleREDCap\FundedGrantDatabase;
+
 # verify user access
 if (!isset($_COOKIE['grant_repo'])) {
-	header("Location: index.php");
+	header("Location: ".$module->getUrl("src/index.php"));
 }
 
 require_once("base.php");
 
 $role = updateRole($userid);
 if ($role == 1 | $role == "") {
-	header("Location: index.php");
+	header("Location: ".$module->getUrl("src/index.php"));
 }
 
 # get metadata
 $metadataJSON = \REDCap::getDataDictionary($grantsProjectId, "json");
 $choices = getChoices(json_decode($metadataJSON, true));
 
+# get grant data records
 $filterLogic = $role == 2 ? '[pi_netid] = "'.$userid.'"' : NULL;
-
-# if role=2, then we only want to show stats for their specific grants
-if ($role == 2) {
-	$filterLogSql = " AND e.pk IN
-		(SELECT record
-		FROM redcap_data
-		WHERE project_id = $grantsProjectId
-		AND field_name = 'pi_netid'
-		AND value = '$userid')";
-}
-
 $grants_result = json_decode(\REDCap::getData(array(
 	'project_id'=>$grantsProjectId, 
 	'filterLogic'=>$filterLogic,
 	"return_format"=>"json"
 )), true);
 
+# grant types
 $grant_types = $choices['grants_type'];
 
 # create array to hold downloads
@@ -52,15 +46,23 @@ foreach ($user_result as $row) {
 	$netIds[$row['user_id']] = array($row['first_name'], $row['last_name']);
 }
 $logEventTable = \REDCap::getLogEventTable($grantsProjectId);
-$sql = "SELECT e.ts, e.user, e.pk
-		FROM $logEventTable e
-        WHERE e.project_id = $grantsProjectId
-            AND e.description = 'Download uploaded document'
-			$filterLogSql
-		ORDER BY e.ts DESC";
-$result = db_query($sql);
 
-while ($row = db_fetch_array($result)) {
+$query = $module->createQuery();
+$query->add("SELECT e.ts, e.user, e.pk 
+	FROM $logEventTable e 
+	WHERE e.project_id = ?
+	AND e.description = 'Download uploaded document'", $grantsProjectId);
+if ($role == 2) {
+	$query->add("AND e.pk IN (SELECT record
+	FROM redcap_data
+	WHERE project_id = ?
+	AND field_name = 'pi_netid'
+	AND value = ?)", [$grantsProjectId, $userid]); 
+}
+$query->add("ORDER BY e.ts DESC");
+$result = $query->execute();
+
+while ($row = $result->fetch_array()) {
 	if ($netIds[$row['user']] && $netIds[$row['user']][0]) {
 		$name = $netIds[$row['user']][0] . " " . $netIds[$row['user']][1];
 		$username = $row['user'];
@@ -73,28 +75,45 @@ while ($row = db_fetch_array($result)) {
 	$downloads[$row['pk']]['hits'][] = array('ts' => $row['ts'], 'user' => $name, 'username' => $username);
 }
 ?>
-
 <html>
 	<head>
-		<title>The Yale University Funded Grant Database - Document Download Information</title>
-		<link rel="shortcut icon" type="image" href="favicon.ico"/> 
+		<title><?php echo $databaseTitle ?> - Document Download Information</title>
+		<link rel="shortcut icon" type="image" href="<?php echo $faviconImage ?>"/> 
 		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.24/af-2.3.5/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/rg-1.1.2/sb-1.0.1/sp-1.2.2/sl-1.3.3/datatables.min.css"/>
- 		<link rel="stylesheet" type="text/css" href="css/basic.css">
+		<link rel="stylesheet" type="text/css" href="<?php echo $module->getUrl("css/basic.css") ?>">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
 		<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.24/af-2.3.5/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/rg-1.1.2/sb-1.0.1/sp-1.2.2/sl-1.3.3/datatables.min.js"></script>
-		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>		
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		<style>
+			table.dataTable tr.dtrg-group.dtrg-level-0 td { 
+				background-color: <?php echo $accentColor; ?>; 
+				color: <?php echo $accentTextColor; ?>;
+			}
+			div.dtsp-panesContainer tr.selected {
+				background-color: <?php echo $secondaryAccentColor; ?> !important;
+				color: <?php echo $secondaryTextColor; ?>;
+			}
+			div.dtsp-panesContainer tr.selected:hover {
+				background-color: <?php echo adjustBrightness($secondaryAccentColor, -0.25); ?> !important;
+				color: <?php
+					$newColor = adjustBrightness($secondaryAccentColor, -0.25);
+					echo adjustBrightness($secondaryTextColor, getBrightness($newColor) >= 0.50 ? -0.50 : 0.50); 
+				?>;
+				cursor: pointer;
+			}
+		</style>		
 	</head>
 	<body>
 		<br/>
-		<div style="padding-left:8%;  padding-right:10%; margin-left:auto; margin-right:auto;   ">
+		<div style="padding-left:8%;  padding-right:10%; margin-left:auto; margin-right:auto;">
 			<div id="header">
 				<?php
 					createHeaderAndTaskBar($role);
 				?>
-				<h3>Yale University Funded Grant Database - Usage Statistics</h3>
+				<h3><?php echo $databaseTitle ?> - Usage Statistics</h3>
 				<i>This page shows who has downloaded grant documents and when they did so.</i>
 				<hr><br/>
 			</div>
@@ -139,8 +158,8 @@ while ($row = db_fetch_array($result)) {
 				/*columns: [
 					{"data": "pi"},
 					{"data": "title"},
-					{"data": "type", "visible": false},
 					{"data": "number"},
+					{"data": "type"},
 					{"data": "user"},
 					{"data": "username"},
 					{"data": "timestamp"}
@@ -159,8 +178,8 @@ while ($row = db_fetch_array($result)) {
 						targets: [0,1,2,3],
 						visible: false,
 						searchable: true
-					},
-					{
+					}
+					/*{
 						targets: [2],
 						searchPanes:{
 							options:[
@@ -172,7 +191,7 @@ while ($row = db_fetch_array($result)) {
 								}
 							]
 						}
-					}
+					}*/
 				],
 				
 				//pageLength: 1000,
@@ -188,7 +207,19 @@ while ($row = db_fetch_array($result)) {
 					{
 						extend: 'searchBuilder'
 					},
-					'colvis', 'csv', 'excel', 'pdf'
+					'colvis',
+					{
+						extend: 'csv',
+						exportOptions: { columns: [0, 1, 2, ':visible'] }
+					},
+					{ 
+						extend: 'excel',
+						exportOptions: { columns: [0, 1, 2, ':visible'] }
+					},
+					{ 
+						extend: 'pdf',
+						exportOptions: { columns: [0, 1, 2, ':visible'] }
+					}
 				]
 
 			});
