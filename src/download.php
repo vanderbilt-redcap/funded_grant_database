@@ -1,6 +1,6 @@
 <?php
 
-namespace YaleREDCap\FundedGrantDatabase;
+/** Authors: Jon Scherdin, Andrew Poppe */
 
 # verify user access
 if (!isset($_COOKIE['grant_repo'])) {
@@ -22,7 +22,12 @@ if (!isset($_GET['record'])) die('No Grant Identified');
 $grant = $_GET['record'];
 
 // log this download (accessing this page counts)
-\REDCap::logEvent("Download uploaded document", NULL, NULL, $grant, NULL, $grantsProjectId);
+\REDCap::logEvent("Download uploaded document", "Funded Grant Database", NULL, $grant, NULL, $grantsProjectId);
+//$module->log("Download uploaded document", array("project_id"=>$grantsProjectId, "record"=>$grant, "user"=>$userid));
+//print_r($module->queryLogs("SELECT timestamp, project_id, record, user")->fetch_assoc());
+
+// log visit
+$module->log("Visited Download Page", array("project_id"=>$grantsProjectId, "user"=>$userid, "role"=>$role));
 
 // If ID is not in query_string, then return error
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) exit("{$lang['global_01']}!");
@@ -33,7 +38,7 @@ $project_id = $_GET['p'];
 define("PROJECT_ID", $project_id);
 
 
-//Download file from the "edocs" web server directory
+// Download file from the "edocs" web server directory
 $result = $module->query("select * from redcap_edocs_metadata where project_id = ? and doc_id = ?", [ $project_id, $_GET['id'] ]);
 $this_file = db_fetch_array($result);
 

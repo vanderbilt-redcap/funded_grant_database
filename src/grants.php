@@ -1,6 +1,6 @@
 <?php
 
-namespace YaleREDCap\FundedGrantDatabase;
+/** Authors: Jon Scherdin, Scott Pearson, Andrew Poppe */
 
 # verify user access
 if (!isset($_COOKIE['grant_repo'])) {
@@ -17,6 +17,8 @@ if ($role == "") {
 	header("Location: ".$module->getUrl("index.php"));
 }
 
+# log visit
+$module->log("Visited Grants Page", array("user"=>$userid, "role"=>$role));
 
 $awards = array(
 	"k_awards" => "K Awards",
@@ -28,17 +30,23 @@ $awards = array(
 );
 
 # get metadata
-$metadataJSON = \REDCap::getDataDictionary($grantsProjectId, "json");
-$choices = getChoices(json_decode($metadataJSON, true));
+$metadata = json_decode(\REDCap::getDataDictionary($grantsProjectId, "json"), true);
+$choices = getChoices($metadata);
 
 # get event_id
 $eventId = $module->getEventId($grantsProjectId);
 
+# get grants instrument name
+$grantsInstrument = getGrantsInstrument($metadata, 'grants_number');
+
+// Pull all data in grants project
+// Except do not include records not marked as "Complete" on grants instrument
 $grants = json_decode(\REDCap::getData(array(
 	"project_id"=>$grantsProjectId, 
 	"return_format"=>"json", 
 	"combine_checkbox_values"=>true,
-	"exportAsLabels"=>true
+	"exportAsLabels"=>true,
+	"filterLogic"=>"[".$grantsInstrument."_complete] = 2"
 )), true);
 
 // get award options

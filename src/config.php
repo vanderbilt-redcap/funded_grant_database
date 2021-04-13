@@ -1,10 +1,14 @@
 <?php
 
-namespace YaleREDCap\FundedGrantDatabase;
+/** Author: Andrew Poppe */
 
 // PIDs of REDCap Projects
 $grantsProjectId        = $module->getSystemSetting("grants-project");
 $userProjectId          = $module->getSystemSetting("users-project");
+
+// Contact Person
+$contactName            = $module->getSystemSetting("contact-name");
+$contactEmail           = $module->getSystemSetting("contact-email"); 
 
 // Aesthetics
 $accentColor            = $module->getSystemSetting("accent-color");
@@ -20,6 +24,19 @@ $databaseTitle          = $module->getSystemSetting("database-title");
 checkPID($grantsProjectId, 'Grants Project');
 checkPID($userProjectId, 'Users Project');
 
+// Check that contact person's deatils are set
+if (is_null($contactName) | is_null($contactEmail)) die ("The contact person's information must be defined in the EM config. Contact your REDCap Administrator.");
+
+// Make sure user project has requisite fields
+$userTestFields = array('user_id', 'user_expiration', 'user_role');
+$userFields = getFieldNames($userProjectId);
+if (!verifyProjectMetadata($userFields, $userTestFields)) die ('The project (PID#'.$userProjectId.') is not a valid users project. Contact your REDCap Administrator.');
+
+// Make sure grants project has requisite fields
+$grantTestFields = array('grants_pi', 'grants_title', 'grants_type', 'grants_date', 'grants_number', 'grants_department', 'grants_thesaurus');
+$grantFields = getFieldNames($grantsProjectId);
+if (!verifyProjectMetadata($grantFields, $grantTestFields)) die('The project (PID#'.$grantsProjectId.') is not a valid grants project. Contact your REDCap Administrator.');
+
 // Set default if any aesthetics are missing
 $accentColor            = is_null($accentColor) ? "#00356b" : $accentColor;
 $accentTextColor        = is_null($accentTextColor) ? "#f9f9f9" : $accentTextColor;
@@ -33,7 +50,7 @@ $databaseTitle          = is_null($databaseTitle) ? "Yale University Funded Gran
 
 function checkPID($pid, $label) {
     global $module;
-    if (is_null($pid)) die ("A PID must be listed for the ".$label." in the system settings.");
+    if (is_null($pid)) die ("A PID must be listed for the ".$label." in the system settings. Contact your REDCap Administrator.");
 
     $sql = 'select * from redcap_projects where project_id = ?';
     $result = $module->query($sql, $pid);
@@ -41,19 +58,19 @@ function checkPID($pid, $label) {
     $error = false;
     if (is_null($row)) {
         $error = true;
-        $message = "The project does not exist";
+        $message = "The project does not exist.";
     } else if (!empty($row["date_deleted"])) {
         $error = true;
         $message = "The project must not be deleted.";
     } else if (!empty($row["completed_time"])) {
         $error = true;
-        $message = "The project must not be in Completed status";
+        $message = "The project must not be in Completed status.";
     } else if ($row["status"] == 2) {
         $error = true;
-        $message = "The project must not be in Analysis/Cleanup status";
+        $message = "The project must not be in Analysis/Cleanup status.";
     }
     if ($error) {
-        die ("<strong>There is a problem with PID".$pid." (".$label."):</strong><br>".$message);
+        die ("<strong>There is a problem with PID".$pid." (".$label."):</strong><br>".$message."<br>Contact your REDCap Administrator.");
     }
 }
 

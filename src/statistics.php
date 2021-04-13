@@ -1,6 +1,6 @@
 <?php
 
-namespace YaleREDCap\FundedGrantDatabase;
+/** Authors: Jon Scherdin, Scott Pearson, Andrew Poppe */
 
 # verify user access
 if (!isset($_COOKIE['grant_repo'])) {
@@ -13,6 +13,9 @@ $role = updateRole($userid);
 if ($role == 1 | $role == "") {
 	header("Location: ".$module->getUrl("src/index.php"));
 }
+
+# log visit
+$module->log("Visited Statistics Page", array("user"=>$userid, "role"=>$role));
 
 # get metadata
 $metadataJSON = \REDCap::getDataDictionary($grantsProjectId, "json");

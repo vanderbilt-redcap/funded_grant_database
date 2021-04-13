@@ -1,6 +1,6 @@
 <?php
 
-namespace YaleREDCap\FundedGrantDatabase;
+/** Authors: Jon Scherdin, Andrew Poppe */
 
 require_once("config.php");
 
@@ -140,3 +140,30 @@ function getBrightness($hexCode) {
     return $sum / (255*3);
 }
 
+function verifyProjectMetadata($projectFields, $fieldsToTest) {
+	foreach ($fieldsToTest as $testField) {
+		if (!in_array($testField, $projectFields)) return false;
+	}
+	return true;
+}
+
+function getFieldNames($pid) {
+	global $module;
+	$sql = "SELECT field_name FROM redcap_metadata WHERE project_id = ?";
+	$query = $module->query($sql, $pid);
+	$result = array();
+	while ($row = $query->fetch_row()) {
+		array_push($result, $row[0]);
+	}
+	return $result;
+}
+
+// $fieldToTest is a field that appears on the grants instrument
+function getGrantsInstrument($metadata, $fieldToTest) {
+	foreach ($metadata as $row) {
+		if ($row['field_name'] == $fieldToTest) {
+			return $row['form_name'];
+		}
+	}
+	return;
+}

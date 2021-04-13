@@ -1,21 +1,22 @@
-# Yale University Funded Grant Database
+# Funded Grant Database - REDCap External Module
 
-Requires two REDCap projects, with project-ids configurable in config.php. Data dictionaries for two REDCap projects exist in the data_dictionary/ directory. This directory should be placed in REDCap's plugins/ directory. (We have not yet converted this to an External Module.)
+## About
 
-README.docx is present only for historical purposes. It is not up-to-date and describes an older version of the system.
+The Funded Grant Database is designed to facilitate the collection and management of information about funded grants at an institution. It also allows the administrator of the database to control access to the grant materials and track who has viewed/downloaded which grants.
 
-A composer.json file is included, and a small number of composer tools is required for the full operation.
+The interface provides robust searching/filtering.
 
-## Installation
+The module additionally requires two REDCap projects to support it. The data dictionaries [here](https://github.com/AndrewPoppe/funded_grant_database/tree/main/data_dictionary) can be used to create those projects. The project IDs for those projects (as well as several aesthetic options) should be configured in the external modules section of the control center.
 
-1. Download the latest release zip/tar and unpack somplace
-1. Copy the entire directory into the `plugins` directory of the REDCap server
-1. Grab the two data dictionaries from the `data_dictionary` folder
-1. Create two projects in REDCap (one for <ins>grants</ins>, one for <ins>users</ins>), and import the appropriate data dictionary
-1. Edit `config.php` with the PIDs for the two projects you created
-1. The database should now be accessible at ***\<your redcap url\>*/plugins/funded_grant_database/grants.php**
+This is a system external module, but enabling the module in a project will add a link to the database in the project's left-side menu.
 
 ## Usage
 
 1. Access to the database can be granted using the *users* project 
 1. Grants can be added using the *grants* project
+1. The database will be accessible at ***\<your redcap url\>*/ExternalModules/?prefix=funded_grant_database&page=src/grants**
+1. Use REDCap's built-in url shortener to give this path a more friendly URL if you like
+
+## Attribution
+
+This EM is based on a plugin originally created at Vanderbilt by Scott Pearson, Jon Scherdin, and Rebecca Helton (email: datacore at vumc.org). 

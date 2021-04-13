@@ -1,6 +1,6 @@
 <?php
 
-namespace YaleREDCap\FundedGrantDatabase;
+/** Authors: Jon Scherdin, Andrew Poppe */
 
 # verify user access
 if (!isset($_COOKIE['grant_repo'])) {

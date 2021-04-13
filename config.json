@@ -18,19 +18,12 @@
                 "icon": "fas fa-database",
                 "url": "src/index.php"
             }
-        ],
-        "control-center": [
-            {
-                "name":"Funded Grant Database",
-                "icon": "fas fa-database",
-                "url": "src/index.php"
-            }
         ]
     },
     "system-settings": [
         {
             "key": "info1",
-            "name": "<strong>The following settings are required. See the EM documentation for more details.</strong>",
+            "name": "<font style=\"font-size:110%;\"><strong>These settings control how the EM functions. See the EM documentation for more details.</strong></font>",
             "required": false,
             "type": "descriptive"
         },
@@ -42,13 +35,61 @@
         },
         {
             "key": "users-project",
-            "name": "<strong>Users REDCap Project</strong>",
+            "name": "<strong>Users REDCap Project:</strong><br>See Grants REDCap Project above",
             "required": true,
             "type": "project-id"
         },
         {
+            "key": "contact-name",
+            "name": "<strong>Contact Person:</strong><br>Name of person at your institution that end users should contact",
+            "required": true,
+            "type": "text"
+        },
+        {
+            "key": "contact-email",
+            "name": "<strong>Contact Person's Email</strong>",
+            "required": true,
+            "type": "email"
+        },
+        {
+            "key": "email-users",
+            "name": "<strong>Email Users Upon Download:</strong><br>Should the system send email notices to users when they download grant documents. At most one email will be sent per day, with information about all grants that were downloaded by the user in the previous 24 hours. Administrators will not receive emails",
+            "required": false,
+            "type": "checkbox"
+        },
+        {
+            "key": "email-from-address",
+            "name": "<strong>From email address</strong>",
+            "required": true,
+            "type": "email",
+            "branchingLogic": {
+                "field": "email-users",
+                "value": 1
+            }
+        },
+        {
+            "key": "email-subject",
+            "name": "<strong>Email subject:</strong><br>Default is <em>Funded Grant Database Document Downloads</em>",
+            "required": false,
+            "type": "text",
+            "branchingLogic": {
+                "field": "email-users",
+                "value": 1
+            }
+        },
+        {
+            "key": "email-body",
+            "name": "<strong>Email body:</strong><br>Default text can be found in the EM documentation. The text <code>[download-table]</code> in the email subject will be replaced with a table of the grant documents the user downloaded. Other replacement options can be found in the EM documentation",
+            "required": false,
+            "type": "rich-text",
+            "branchingLogic": {
+                "field": "email-users",
+                "value": 1
+            }
+        },
+        {
             "key": "info2",
-            "name": "<strong>The following optional settings control cosmetic and text changes.</strong>",
+            "name": "<font style=\"font-size:110%;\"><strong>The following optional settings control cosmetic and text changes.</strong></font>",
             "required": false,
             "type": "descriptive"
         },
@@ -95,7 +136,17 @@
             "type": "text"
         }
     ],
-    "project-settings": [
-
-    ]
+    "crons": [
+        {
+            "cron_name": "email-cron",
+            "cron_description": "Cron that runs daily at 6:00 PM to send download notification emails.",
+            "method": "send_download_emails",
+            "cron_hour": 18,
+            "cron_minute": 0
+        }
+    ],
+    "compatibility": {
+        "redcap-version-min": "9.10.0",
+        "redcap-version-max": ""
+    }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace YaleREDCap\FundedGrantDatabase;
+/** Authors: Jon Scherdin, Scott Pearson, Andrew Poppe */
 
 require_once("base.php");
 
@@ -16,6 +16,9 @@ if (db_num_rows($result) > 0) {
 	$user_id = db_result($result, 0, 0);
 	$role = db_result($result, 0, 1);
 }
+
+# log visit
+$module->log("Visited Index Page", array("user"=>$userid, "role"=>$role));
 
 # if they have agreed to the terms, create the cookie and redirect them to the grants page
 if (isset($_POST['submit'])) {
@@ -52,12 +55,12 @@ if ($role != "") {
                     <li>I will not share any part(s) of the grants in the database.</li>
                     <li>I agree not to utilize any text of the grant in my own grant.</li>
                     <li>I understand that the individuals who provided grants will be able to view a list of names of those who accessed their grants.</li>
-                    <li>I agree to provide a copy of my grant to the Office of Research after submission to be kept on file and reviewed for compliance to this agreement.</li>
+                    <li>I agree to provide a copy of my grant after submission to be kept on file and reviewed for compliance to this agreement.</li>
                 </ul>
                 <form  method="post">
                     <input type="submit" value="I agree to all terms above" name="submit" style="cursor: pointer;">
                 </form>';
 } else {
-    echo 'Please contact Keith Choate at <a href="mailto:keith.choate@yale.edu">keith.choate@yale.edu</a> to gain access to the '.$databaseTitle.'.';
+    echo 'Please contact '.$contactName.' at <a href="mailto:'.$contactName.'">'.$contactName.'</a> to gain access to the '.$databaseTitle.'.';
 }
 echo '</div></html>';
