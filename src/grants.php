@@ -101,6 +101,7 @@ $awardOptionValues = combineValues($grants, array_keys($awards));
 						<th>Award Option</th>
 						<th style="width: 150px;">Grant Date</th>
 						<th>Grant #</th>
+						<th>Department</th>
 						<th>Acquire</th>
 						<th>Thesaurus</th>
 					</tr>
@@ -120,8 +121,9 @@ $awardOptionValues = combineValues($grants, array_keys($awards));
 							echo "<td style='text-align: center;'>" . $awardOptionValues[$id] . "</td>";		// 4 - Award Option
 							echo "<td style='text-align: center;'>" . $row['grants_date'] ."</td>";				// 5 - Grant Date
 							echo "<td style='text-align: center;'>" . $row['grants_number'] . "</td>";			// 6 - Grant Number
-							echo "<td style='text-align: center;'><a href='$url'>Download</a></td>";			// 7 - Acquire
-							echo "<td style='text-align: center;'>" . $row["grants_thesaurus"] . "</td>";		// 8 - Thesaurus (keywords)
+							echo "<td style='text-align: center;'>" . $row['grants_department'] . "</td>";		// 7 - Department
+							echo "<td style='text-align: center;'><a href='$url'>Download</a></td>";			// 8 - Acquire
+							echo "<td style='text-align: center;'>" . $row["grants_thesaurus"] . "</td>";		// 9 - Thesaurus (keywords)
 						echo "</tr>";
 					}
 					?>
@@ -179,6 +181,7 @@ $awardOptionValues = combineValues($grants, array_keys($awards));
 						},
 						{"data": "date"},
 						{"data": "number"},
+						{"data": "department", "visible": false},
 						{"data": "acquire", "searchable": false},
 						{"data": "thesaurus", "visible": false}
 					],

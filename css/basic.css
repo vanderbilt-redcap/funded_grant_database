@@ -14,6 +14,9 @@ table.dataTable tr.dtrg-group.dtrg-level-1 td {
 div.dt-buttons {
     margin-left: 10px;
 }
+div.dtsp-panesContainer {
+	width: auto;
+}
 div.dtsp-panesContainer tr {
     background-color: #fff !important;
 }

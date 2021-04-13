@@ -36,6 +36,7 @@ foreach ($grants_result as $row) {
 	$downloads[$row['record_id']]['number'] = $row['grants_number'];
 	$downloads[$row['record_id']]['pi'] = $row['grants_pi'];
 	$downloads[$row['record_id']]['type'] = $grant_types[$row['grants_type']];
+	$downloads[$row['record_id']]['department'] = $row['grants_department'];
 }
 
 
@@ -126,6 +127,7 @@ while ($row = $result->fetch_array()) {
 						<th>Grant Title</th>
 						<th>Grant #</th>
 						<th>Grant Type</th>
+						<th>Grant Department</th>
 						<th>User</th>
 						<th>Username</th>
 						<th>Access Datetime</th>
@@ -143,6 +145,7 @@ while ($row = $result->fetch_array()) {
 							echo "<td>".$value['title']."</td>";
 							echo "<td style='text-align: center;'>".$value['number']."</td>";
 							echo "<td style='text-align: center;'>".$value['type']."</td>";
+							echo "<td style='text-align: center;'>".$value['department']."</td>";
 							echo "<td style='text-align: center;'>".$log['user']."</td>";
 							echo "<td style='text-align: center;'>".$log['username']."</td>";
 							echo "<td style='text-align: center;'>".date('Y-m-d H:i:s', $timestamp)."</td>";
@@ -155,15 +158,6 @@ while ($row = $result->fetch_array()) {
 		<script>
 		$(document).ready( function () {
 			$('#statsTable').DataTable({
-				/*columns: [
-					{"data": "pi"},
-					{"data": "title"},
-					{"data": "number"},
-					{"data": "type"},
-					{"data": "user"},
-					{"data": "username"},
-					{"data": "timestamp"}
-				],*/
 				order: [[0, 'asc'], [1, 'asc']],
 				rowGroup: {
 					dataSrc: [
@@ -175,7 +169,7 @@ while ($row = $result->fetch_array()) {
 				},
 				columnDefs: [
 					{
-						targets: [0,1,2,3],
+						targets: [0,1,2,3,4],
 						visible: false,
 						searchable: true
 					}
