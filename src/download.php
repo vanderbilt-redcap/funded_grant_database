@@ -93,8 +93,8 @@ function inspectDir($dir) {
 ?>
 <html>
 	<head>
-		<title><?php echo $databaseTitle ?> - Document Download</title>
-		<link rel="shortcut icon" type="image" href="<?php echo $faviconImage ?>"/> 
+		<title><?php echo \REDCap::escapeHtml($databaseTitle) ?> - Document Download</title>
+		<link rel="shortcut icon" type="image" href="<?php echo \REDCap::escapeHtml($faviconImage) ?>"/> 
 		<link rel="stylesheet" type="text/css" href="<?php echo $module->getUrl("css/basic.css") ?>">
 	</head>
 	<br/>
@@ -110,7 +110,7 @@ function inspectDir($dir) {
 			echo "<h1>All Files (".count($files).")</h1>\n";
 			foreach ($files as $filename) {
 				$truncFilename = truncateFile($filename);
-				echo "<p><a href='".$module->getUrl("src/downloadFile.php?f=".urlencode($truncFilename))."'>".basename($filename)."</a></p>\n";
+				echo "<p><a href='".\REDCap::escapeHtml($module->getUrl("src/downloadFile.php?f=".urlencode($truncFilename)))."'>".\REDCap::escapeHtml(basename($filename))."</a></p>\n";
 			}
 			exit();
 		} else {

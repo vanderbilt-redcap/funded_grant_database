@@ -66,15 +66,15 @@ function updateRole($userid) {
 
 function createHeaderAndTaskBar($role) {
 	global $module, $logoImage, $accentColor, $grantsProjectId, $userProjectId;
-	echo '<div style="padding: 10px; background-color: '.$accentColor.';"></div><img src="'.$logoImage.'" style="vertical-align:middle"/>
+	echo '<div style="padding: 10px; background-color: '.\REDCap::escapeHtml($accentColor).';"></div><img src="'.\REDCap::escapeHtml($logoImage).'" style="vertical-align:middle"/>
 			<hr>
 			<a href="'.$module->getUrl("src/grants.php").'">Grants</a> | ';
 	if ($role != 1) {
 		echo '<a href="'.$module->getUrl("src/statistics.php").'">Use Statistics</a> | ';
 	}
 	if ($role == 3) {
-		echo "<a href='".APP_PATH_WEBROOT."DataEntry/record_status_dashboard.php?pid=$grantsProjectId' target='_blank'>Register Grants</a> | ";
-		echo "<a href='".APP_PATH_WEBROOT."DataEntry/record_status_dashboard.php?pid=$userProjectId' target='_blank'>Administer Users</a> | ";
+		echo "<a href='".APP_PATH_WEBROOT."DataEntry/record_status_dashboard.php?pid=".\REDCap::escapeHtml($grantsProjectId)."' target='_blank'>Register Grants</a> | ";
+		echo "<a href='".APP_PATH_WEBROOT."DataEntry/record_status_dashboard.php?pid=".\REDCap::escapeHtml($userProjectId)."' target='_blank'>Administer Users</a> | ";
 	}
 	echo '<a href ="http://projectreporter.nih.gov/reporter.cfm">NIH RePORTER</a> |
 	<a href ="http://grants.nih.gov/grants/oer.htm">NIH-OER</a>';

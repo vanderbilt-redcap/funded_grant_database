@@ -81,8 +81,8 @@ while ($row = $result->fetch_array()) {
 ?>
 <html>
 	<head>
-		<title><?php echo $databaseTitle ?> - Document Download Information</title>
-		<link rel="shortcut icon" type="image" href="<?php echo $faviconImage ?>"/> 
+		<title><?php echo \REDCap::escapeHtml($databaseTitle) ?> - Document Download Information</title>
+		<link rel="shortcut icon" type="image" href="<?php echo \REDCap::escapeHtml($faviconImage) ?>"/> 
 		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.24/af-2.3.5/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/rg-1.1.2/sb-1.0.1/sp-1.2.2/sl-1.3.3/datatables.min.css"/>
 		<link rel="stylesheet" type="text/css" href="<?php echo $module->getUrl("css/basic.css") ?>">
@@ -93,12 +93,12 @@ while ($row = $result->fetch_array()) {
 		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 		<style>
 			table.dataTable tr.dtrg-group.dtrg-level-0 td { 
-				background-color: <?php echo $accentColor; ?>; 
-				color: <?php echo $accentTextColor; ?>;
+				background-color: <?php echo \REDCap::escapeHtml($accentColor); ?>; 
+				color: <?php echo \REDCap::escapeHtml($accentTextColor); ?>;
 			}
 			div.dtsp-panesContainer tr.selected {
-				background-color: <?php echo $secondaryAccentColor; ?> !important;
-				color: <?php echo $secondaryTextColor; ?>;
+				background-color: <?php echo \REDCap::escapeHtml($secondaryAccentColor); ?> !important;
+				color: <?php echo \REDCap::escapeHtml($secondaryTextColor); ?>;
 			}
 			div.dtsp-panesContainer tr.selected:hover {
 				background-color: <?php echo adjustBrightness($secondaryAccentColor, -0.25); ?> !important;
@@ -144,13 +144,13 @@ while ($row = $result->fetch_array()) {
 					foreach ($value['hits'] as $log) {
 						$timestamp = strtotime($log['ts']);
 						echo "<tr>";
-							echo "<td style='white-space:nowrap;'>".$value['pi']."</td>";
-							echo "<td>".$value['title']."</td>";
-							echo "<td style='text-align: center;'>".$value['number']."</td>";
-							echo "<td style='text-align: center;'>".$value['type']."</td>";
-							echo "<td style='text-align: center;'>".$value['department']."</td>";
-							echo "<td style='text-align: center;'>".$log['user']."</td>";
-							echo "<td style='text-align: center;'>".$log['username']."</td>";
+							echo "<td style='white-space:nowrap;'>".\REDCap::escapeHtml($value['pi'])."</td>";
+							echo "<td>".\REDCap::escapeHtml($value['title'])."</td>";
+							echo "<td style='text-align: center;'>".\REDCap::escapeHtml($value['number'])."</td>";
+							echo "<td style='text-align: center;'>".\REDCap::escapeHtml($value['type'])."</td>";
+							echo "<td style='text-align: center;'>".\REDCap::escapeHtml($value['department'])."</td>";
+							echo "<td style='text-align: center;'>".\REDCap::escapeHtml($log['user'])."</td>";
+							echo "<td style='text-align: center;'>".\REDCap::escapeHtml($log['username'])."</td>";
 							echo "<td style='text-align: center;'>".date('Y-m-d H:i:s', $timestamp)."</td>";
 						echo "</tr>";
 					}

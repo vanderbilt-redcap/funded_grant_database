@@ -58,8 +58,8 @@ $awardOptionValues = combineValues($grants, array_keys($awards));
 
 <html>
 	<head>
-		<title><?php echo $databaseTitle ?></title>
-		<link rel="shortcut icon" type="image" href="<?php echo $faviconImage ?>"/> 
+		<title><?php echo \REDCap::escapeHtml($databaseTitle) ?></title>
+		<link rel="shortcut icon" type="image" href="<?php echo \REDCap::escapeHtml($faviconImage) ?>"/> 
 		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.24/af-2.3.5/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/rg-1.1.2/sb-1.0.1/sp-1.2.2/sl-1.3.3/datatables.min.css"/>
  		<link rel="stylesheet" type="text/css" href="<?php echo $module->getUrl("css/basic.css") ?>">
@@ -70,12 +70,12 @@ $awardOptionValues = combineValues($grants, array_keys($awards));
 		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 		<style>
 			table.dataTable tr.dtrg-group.dtrg-level-0 td { 
-				background-color: <?php echo $accentColor; ?>; 
-				color: <?php echo $accentTextColor; ?>;
+				background-color: <?php echo \REDCap::escapeHtml($accentColor); ?>; 
+				color: <?php echo \REDCap::escapeHtml($accentTextColor); ?>;
 			}
 			div.dtsp-panesContainer tr.selected {
-				background-color: <?php echo $secondaryAccentColor; ?> !important;
-				color: <?php echo $secondaryTextColor; ?>;
+				background-color: <?php echo \REDCap::escapeHtml($secondaryAccentColor); ?> !important;
+				color: <?php echo \REDCap::escapeHtml($secondaryTextColor); ?>;
 			}
 			div.dtsp-panesContainer tr.selected:hover {
 				background-color: <?php echo adjustBrightness($secondaryAccentColor, -0.25); ?> !important;
@@ -92,7 +92,7 @@ $awardOptionValues = combineValues($grants, array_keys($awards));
 		<div id="container" style="padding-left:8%;  padding-right:10%; margin-left:auto; margin-right:auto; ">
 			<div id="header">
 				<?php createHeaderAndTaskBar($role);?>
-				<h3><?php echo $databaseTitle ?></h3>
+				<h3><?php echo \REDCap::escapeHtml($databaseTitle) ?></h3>
 				<i>You may download grant documents by clicking "download" links below. The use of the grants document database is strictly limited to authorized individuals and you are not permitted to share files or any embedded content with other individuals. All file downloads are logged.</i>
 				<hr/>
 			</div>
@@ -122,16 +122,16 @@ $awardOptionValues = combineValues($grants, array_keys($awards));
 							$eventId . "&field_name=grants_file");
 
 						echo "<tr>";
-							echo "<td style='white-space:nowrap;'>" . $row['grants_pi'] . "</td>";				// 0 - PI
-							echo "<td>" . $row['grants_title'] . "</td>";										// 1 - Title
-							echo "<td style='text-align: center;'></td>";										// 2 - NIH Format
-							echo "<td style='text-align: center;'>" . $row['grants_type'] . "</td>";			// 3 - Award Type
-							echo "<td style='text-align: center;'>" . $awardOptionValues[$id] . "</td>";		// 4 - Award Option
-							echo "<td style='text-align: center;'>" . $row['grants_date'] ."</td>";				// 5 - Grant Date
-							echo "<td style='text-align: center;'>" . $row['grants_number'] . "</td>";			// 6 - Grant Number
-							echo "<td style='text-align: center;'>" . $row['grants_department'] . "</td>";		// 7 - Department
-							echo "<td style='text-align: center;'><a href='$url'>Download</a></td>";			// 8 - Acquire
-							echo "<td style='text-align: center;'>" . $row["grants_thesaurus"] . "</td>";		// 9 - Thesaurus (keywords)
+							echo "<td style='white-space:nowrap;'>" . \REDCap::escapeHtml($row['grants_pi']) . "</td>";				// 0 - PI
+							echo "<td>" . \REDCap::escapeHtml($row['grants_title']) . "</td>";										// 1 - Title
+							echo "<td style='text-align: center;'></td>";															// 2 - NIH Format
+							echo "<td style='text-align: center;'>" . \REDCap::escapeHtml($row['grants_type']) . "</td>";			// 3 - Award Type
+							echo "<td style='text-align: center;'>" . \REDCap::escapeHtml($awardOptionValues[$id]) . "</td>";		// 4 - Award Option
+							echo "<td style='text-align: center;'>" . \REDCap::escapeHtml($row['grants_date']) ."</td>";			// 5 - Grant Date
+							echo "<td style='text-align: center;'>" . \REDCap::escapeHtml($row['grants_number']) . "</td>";			// 6 - Grant Number
+							echo "<td style='text-align: center;'>" . \REDCap::escapeHtml($row['grants_department']) . "</td>";		// 7 - Department
+							echo "<td style='text-align: center;'><a href='".\REDCap::escapeHtml($url)."'>Download</a></td>";		// 8 - Acquire
+							echo "<td style='text-align: center;'>" . \REDCap::escapeHtml($row["grants_thesaurus"]) . "</td>";		// 9 - Thesaurus (keywords)
 						echo "</tr>";
 					}
 					?>
