@@ -6,12 +6,6 @@ namespace YaleREDCap\FundedGrantDatabase;
 
 class FundedGrantDatabase extends \ExternalModules\AbstractExternalModule {
     
-    
-
-
-
-
-
 
     /*********************************************\
      * THIS SECTION DEALS WITH EMAILING USERS    *
